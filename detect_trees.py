@@ -1,29 +1,42 @@
+import numpy as np
 from pathlib import Path
 from tree_detection_framework.preprocessing.preprocessing import create_dataloader
 from tree_detection_framework.detection.detector import GeometricTreeTopDetector
 from tree_detection_framework.postprocessing.postprocessing import (
     remove_edge_detections,
 )
+import itertools
 
 INPUT_FOLDER = "/ofo-share/species-prediction-project/intermediate/CHMs"
 OUTPUT_FOLDER = "/ofo-share/scratch-david/species-tree-detection-eval/predictions"
-PARAMETER_SETS = [
-    {"c": 1.3, "b": 0.0222, "a": 0.0},
-    {"c": 0.1, "b": -0.1, "a": 0.0},
-    {"c": 1.9, "b": 0.046, "a": 0.0},
-    {"c": 0.9, "b": 0.046, "a": 0.0},
-    {"c": 1.1, "b": 0.046, "a": 0.0},
-    {"c": 0.1, "b": 0.096, "a": 0.0},
-    {"c": 0.5, "b": 0.046, "a": 0.0},
-    {"c": 0.1, "b": 0.046, "a": 0.0},
-    {"c": 0.7, "b": 0.046, "a": 0.0},
-]
+
+c = np.linspace(0.0, 1.0, num=5)
+b = np.linspace(0.2, 0.7, num=5)
+
+params = itertools.product(c, b)
+
+PARAMETER_SETS = [{"c": p[0], "b": p[1], "a": 0.0} for p in params]
+#PARAMETER_SETS = [
+#    {"c": 0.0, "b": 0.11, "a": 0.0},
+#]
+#[
+## [
+#    {"c": 1.3, "b": 0.0222, "a": 0.0},
+#    #    {"c": 0.1, "b": -0.1, "a": 0.0},
+#    {"c": 1.9, "b": 0.046, "a": 0.0},
+#    {"c": 0.9, "b": 0.046, "a": 0.0},
+#    {"c": 1.1, "b": 0.046, "a": 0.0},
+#    {"c": 0.1, "b": 0.096, "a": 0.0},
+#    {"c": 0.5, "b": 0.046, "a": 0.0},
+#    {"c": 0.1, "b": 0.046, "a": 0.0},
+#    {"c": 0.7, "b": 0.046, "a": 0.0},
+#]
 CHIP_SIZE = 2000
 CHIP_STRIDE = 1900
 RESOLUTION = 0.2
 
 if __name__ == "__main__":
-    input_files = Path(INPUT_FOLDER).glob("*.tif")
+    input_files = list(Path(INPUT_FOLDER).glob("*.tif"))
 
     for params in PARAMETER_SETS:
         output_subfolder = (
